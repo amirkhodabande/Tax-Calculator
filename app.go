@@ -11,9 +11,15 @@ func main() {
 	taxRates := []float64{0., 0.7, 0.1, 0.15}
 
 	for _, taxRate := range taxRates {
-		fm := filemanager.New("./storage/prices.txt", fmt.Sprintf("./storage/result_%v.json", taxRate))
+		fm := filemanager.New("./storage/prices11.txt", fmt.Sprintf("./storage/result_%v.json", taxRate))
 		priceJob := prices.NewTaxIncludedPriceJob(fm, taxRate)
 
-		priceJob.Process()
+		err := priceJob.Process()
+
+		if err != nil {
+			fmt.Println(err)
+
+			return
+		}
 	}
 }
