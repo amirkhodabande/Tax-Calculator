@@ -1,47 +1,22 @@
 package prices
 
 import (
-	"bufio"
 	"fmt"
-	"os"
-	"strconv"
+
+	"go.ir/filemanager"
 )
 
 type TaxIncludedPriceJob struct {
 	TaxRate          float64
 	InputPrices      []float64
-	TaxIncludedPrice map[string]float64
+	TaxIncludedPrice map[string]string
 }
 
 func (job *TaxIncludedPriceJob) LoadData() {
-	file, err := os.Open("./storage/prices.txt")
+	lines, err := filemanager.ReadFloatFromFile("./storage/prices.txt")
 
 	if err != nil {
 		fmt.Println(err)
-		return
-	}
-
-	scanner := bufio.NewScanner(file)
-
-	var lines []float64
-
-	for scanner.Scan() {
-		floatPrice, err := strconv.ParseFloat(scanner.Text(), 64)
-
-		if err != nil {
-			fmt.Println(err)
-			file.Close()
-			return
-		}
-
-		lines = append(lines, floatPrice)
-	}
-
-	err = scanner.Err()
-
-	if err != nil {
-		fmt.Println(err)
-		file.Close()
 		return
 	}
 
@@ -58,6 +33,9 @@ func (job *TaxIncludedPriceJob) Process() {
 
 		result[fmt.Sprintf("%.2f", price)] = fmt.Sprintf("%.2f", taxIncludedPrice)
 	}
+	job.TaxIncludedPrice = result
+
+	filemanager.WriteJson(fmt.Sprintf("./storage/result_%v.json", job.TaxRate), job)
 
 	fmt.Println(result)
 }
