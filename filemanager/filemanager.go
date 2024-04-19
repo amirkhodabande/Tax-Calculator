@@ -27,6 +27,8 @@ func (fm FileManager) ReadFloatFromFile() ([]float64, error) {
 		return nil, err
 	}
 
+	defer file.Close()
+
 	scanner := bufio.NewScanner(file)
 
 	var lines []float64
@@ -35,7 +37,6 @@ func (fm FileManager) ReadFloatFromFile() ([]float64, error) {
 		floatPrice, err := strconv.ParseFloat(scanner.Text(), 64)
 
 		if err != nil {
-			file.Close()
 			return nil, err
 		}
 
@@ -45,7 +46,6 @@ func (fm FileManager) ReadFloatFromFile() ([]float64, error) {
 	err = scanner.Err()
 
 	if err != nil {
-		file.Close()
 		return nil, err
 	}
 
@@ -59,14 +59,14 @@ func (fm FileManager) WriteResult(data any) error {
 		return errors.New("failed to create file")
 	}
 
+	defer file.Close()
+
 	encoder := json.NewEncoder(file)
 	err = encoder.Encode(data)
 
 	if err != nil {
-		file.Close()
 		return errors.New("failed to encode data")
 	}
 
-	file.Close()
 	return nil
 }
